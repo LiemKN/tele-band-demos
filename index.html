@@ -22,12 +22,12 @@
       <div id="edit-container"></div>
       <div class="button-container">
         <button class="png" onclick="loadPNG()">PNG</button>
-        <button class="png" onclick="loadXML()">Music XML</button>
+        <button class="png" onclick="loadXML()">Music XML/MXL</button>
         <button class="png" onclick="loadJSON()">JSON</button>
         <button class="png" onclick="loadMIDI()">MIDI</button>
         <button class="png" onclick="loadMeta()">Score Meta</button>
       </div>
-      <h3 class="result-header">Result:</h3>
+      <h3 id="result-header">Result:</h3>
       <div id="result-container"><img id="img" src="" alt=""></div>
     </div>
     <div class="righter"></div>
@@ -50,58 +50,45 @@
   var resultContainer = document.getElementById("result-container");
   var resultEmbed = new Flat.Embed(resultContainer, {
     "width": "100%",
+    "height": "300",
     "embedParams": {
       "appId": "60a51c906bcde01fc75a3ad0",
     },
   });
 
-  const url = document.getElementById()
+  let resultHeader = document.getElementById('result-header')
+
   async function loadPNG() {
-    await edit.getPNG({
+    let png = await edit.getPNG({
       result: 'dataURL',
       // layout: 'layout',
       // dpi: 300
-    }).then((png) => {
-      // 300 DPI PNG with the score as a page, returned as a DataURL
-      console.log(png);
-      const img = document.getElementById('img')
-      img.src = png
-    });
+    })
+    resultHeader.innerHTML = 'Rendering PNG:'
+    const img = document.getElementById('img')
+    img.src = png
   }
 
   async function loadXML() {
-    await edit.getMusicXML({ compressed: true }).then(function (buffer) {
-      // Create a Blob from a compressed MusicXML file (Uint8Array)
-      // let blobUrl = window.URL.createObjectURL(new Blob([buffer], {
-      //   type: 'application/vnd.recordare.musicxml+xml'
-      // }));
-      const img = document.getElementById('img')
-      img.src = ''
-      return resultEmbed.loadMusicXML(buffer);
-    }).then(function () {
-      // Score loaded in the embed
-      console.log('xml loaded');
-    }).catch(function (error) {
-      // Unable to load the score
-      console.log(error);
-    });
+    let buffer = await edit.getMusicXML({ compressed: true })
+    const img = document.getElementById('img')
+    resultHeader.innerHTML = 'Rendering MXL (compressed):'
+    img.src = ''
+    resultEmbed.loadMusicXML(buffer);
   }
 
   async function loadJSON() {
-    await edit.getJSON().then((data) => {
-      const img = document.getElementById('img')
-      img.src = ''
-      return resultEmbed.loadJSON(data)
-    }).catch(function (error) {
-      // Unable to get the data
-      console.log(error);
-    });
+    let data = await edit.getJSON()
+    const img = document.getElementById('img')
+    resultHeader.innerHTML = 'Rendering JSON:'
+    img.src = ''
+    resultEmbed.loadJSON(data)
   }
 
   async function loadMIDI() {
-    await edit.getMIDI().then((midi) => {
-      console.log(midi);
-    })
+    let midi = await edit.getMIDI()
+    console.log(midi)
+    alert('not working yet!')
   }
 
   async function loadMeta() {
