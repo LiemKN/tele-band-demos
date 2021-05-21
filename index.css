@@ -32,8 +32,10 @@ header {
   flex-grow: 3;
 }
 
-.not-active {
-  display: none;
+#result-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .button-container {
