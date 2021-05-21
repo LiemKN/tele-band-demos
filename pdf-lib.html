@@ -1,0 +1,104 @@
+<html>
+
+<head>
+ <link rel="stylesheet" href="index.css">
+ <meta charset="utf-8" />
+ <script src="https://unpkg.com/pdf-lib@1.4.0"></script>
+ <script src="https://unpkg.com/downloadjs@1.4.7"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.12/lib/draggable.bundle.js"></script>
+ <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+ <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+
+<body>
+ <header>
+  <h2>Beginning stage of drag-and-drop UI...</h2>
+  <button onclick="modifyPdf()">Load in PDF with a quarter note</button>
+ </header>
+ <div class="drag-and-drop-container">
+  <div class="toolbox">
+   <p><strong>Music Toolbox</strong></p>
+   <div class="note-container">
+    <img class="draggable quarter-note music-tool" src="quarter_note.png" alt="quarter-note">
+    <img class="draggable music-tool" src="half_note.png" alt="half-note">
+    <img class="draggable music-tool" src="whole_note.svg" alt="whole-note">
+   </div>
+  </div>
+  <div class="grid-filler"></div>
+  <div class="pdf-container">
+   <iframe class="droppable" id="source-doc-iframe"></iframe>
+   <iframe id="iframe"></iframe>
+  </div>
+ </div>
+</body>
+
+<script>
+ const { degrees, PDFDocument, rgb, StandardFonts } = PDFLib
+ const url = 'https://pdf-lib.js.org/assets/with_update_sections.pdf'
+
+ // Used to render PDF
+ const renderInIframe = (pdfBytes) => {
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  const blobUrl = URL.createObjectURL(blob);
+  console.log('put the source in there!')
+  console.log('have elem?', document.getElementById('iframe'))
+  document.getElementById('iframe').src = blobUrl;
+ };
+
+ // Load in PDF
+ window.addEventListener('load', () => {
+  console.log('onload')
+  document.getElementById('source-doc-iframe').src = url;
+ })
+
+ // const draggable = new Draggable.Draggable(document.querySelectorAll('.toolbox'));
+ $(".draggable").draggable();
+ $(".droppable").droppable({
+  drop: () => {
+   alert("dropped");
+  }
+ });
+
+ // Draws image onto an existing PDF
+ async function modifyPdf() {
+  // Fetch an existing PDF document
+  const url = 'https://pdf-lib.js.org/assets/with_update_sections.pdf'
+  const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer())
+  // Fetch PNG image
+  const pngUrl = 'https://static.thenounproject.com/png/501761-200.png'
+  const pngImageBytes = await fetch(pngUrl).then((res) => res.arrayBuffer())
+
+  // Load a PDFDocument from the existing PDF bytes
+  const pdfDoc = await PDFDocument.load(existingPdfBytes)
+
+  // Embed the PNG image bytes and PNG image bytes
+  const pngImage = await pdfDoc.embedPng(pngImageBytes)
+
+  // Get the width/height of the JPG image scaled down to 15% of its original size; Dims stands for dimensions
+  const pngDims = pngImage.scale(0.15)
+
+  // Get the first page of the document
+  const pages = pdfDoc.getPages()
+  const firstPage = pages[0]
+
+  // Get the width and height of the first page
+  const { width, height } = firstPage.getSize()
+
+  // x is offset from the left side; y is offset from the bottom
+  firstPage.drawImage(pngImage, {
+   x: pngDims.width / 2,
+   y: firstPage.getHeight() / 2 - pngDims.height / 2,
+   width: pngDims.width,
+   height: pngDims.height,
+  })
+
+  // Serialize the PDFDocument to bytes (a Uint8Array)
+  const pdfBytes = await pdfDoc.save()
+  renderInIframe(pdfBytes)
+
+			// Trigger the browser to download the PDF document
+      /* download(pdfBytes, "pdf-lib_modification_example.pdf", "application/pdf") */;
+ }
+</script>
+
+</html>

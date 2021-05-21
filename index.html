@@ -1,90 +1,112 @@
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <script src="https://unpkg.com/pdf-lib@1.4.0"></script>
-    <script src="https://unpkg.com/downloadjs@1.4.7"></script>
-  </head>
+<!DOCTYPE html>
+<html lang="en">
 
-  <body>
-    <h1>Courtesy of <code>pdf-lib</code></h1>
-    <p>Click the button on the left to see the pdf without the quarter note. Click the button on the right to see the pdf with the quarter note</p>
-    <div>
-      <!-- <button onclick="beforePdf()">PDF with NO quarter note...</button> -->
-      <button onclick="modifyPdf()">PDF with a quarter note!!!</button>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <script src="https://prod.flat-cdn.com/embed-js/v1.3.0/embed.min.js"></script>
+  <title>Flat.io File type demo</title>
+</head>
+
+<body>
+  <header>
+    <h1>Flat.io File Type Rendering Demo</h1>
+  </header>
+  <div class="demo-container">
+    <div class="lefter"></div>
+    <div class="chester">
+      <h3 class="edit">Edit score below then click one of the buttons render your desired file type
+        below!</h3>
+      <div id="edit-container"></div>
+      <div class="button-container">
+        <button class="png" onclick="loadPNG()">PNG</button>
+        <button class="png" onclick="loadXML()">Music XML</button>
+        <button class="png" onclick="loadJSON()">JSON</button>
+        <button class="png" onclick="loadMIDI()">MIDI</button>
+        <button class="png" onclick="loadMeta()">Score Meta</button>
+      </div>
+      <h3 class="result-header">Result:</h3>
+      <div id="result-container"><img id="img" src="" alt=""></div>
     </div>
-    <p class="small">(Your browser will download the resulting file)</p>
-    <iframe id="source-doc-iframe"></iframe>
-    <iframe id="iframe">
-    </iframe>
-  </body>
+    <div class="righter"></div>
+  </div>
+</body>
 
-  <script>
-    const { degrees, PDFDocument, rgb, StandardFonts } = PDFLib
-    const url = 'https://pdf-lib.js.org/assets/with_update_sections.pdf'
-    const renderInIframe = (pdfBytes) => {
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      const blobUrl = URL.createObjectURL(blob);
-      console.log('put the source in there!')
-      console.log('have elem?', document.getElementById('iframe'))
-      document.getElementById('iframe').src = blobUrl;
-    };
-		window.addEventListener('load', () => {
-      console.log('onload')
-      document.getElementById('source-doc-iframe').src= url;
+<script>
+  var editContainer = document.getElementById("edit-container");
+  var edit = new Flat.Embed(editContainer, {
+    "width": "100%",
+    "height": "450",
+    "score": "60a51bf21c50d81fb20e3527",
+    "embedParams": {
+      "mode": "edit",
+      "appId": "60a51c906bcde01fc75a3ad0",
+      "sharingKey": "d1ec638f0eade5a3a2ad3bcadce9b7664273a7b2352844458385fe7d8d20238620f61a668ee3055d2d3177bd9282fcc88c692ea81e6668ae1610b37cde6aae93"
+    },
+  });
+
+  var resultContainer = document.getElementById("result-container");
+  var resultEmbed = new Flat.Embed(resultContainer, {
+    "width": "100%",
+    "embedParams": {
+      "appId": "60a51c906bcde01fc75a3ad0",
+    },
+  });
+
+  const url = document.getElementById()
+  async function loadPNG() {
+    await edit.getPNG({
+      result: 'dataURL',
+      // layout: 'layout',
+      // dpi: 300
+    }).then((png) => {
+      // 300 DPI PNG with the score as a page, returned as a DataURL
+      console.log(png);
+      const img = document.getElementById('img')
+      img.src = png
+    });
+  }
+
+  async function loadXML() {
+    await edit.getMusicXML({ compressed: true }).then(function (buffer) {
+      // Create a Blob from a compressed MusicXML file (Uint8Array)
+      // let blobUrl = window.URL.createObjectURL(new Blob([buffer], {
+      //   type: 'application/vnd.recordare.musicxml+xml'
+      // }));
+      const img = document.getElementById('img')
+      img.src = ''
+      return resultEmbed.loadMusicXML(buffer);
+    }).then(function () {
+      // Score loaded in the embed
+      console.log('xml loaded');
+    }).catch(function (error) {
+      // Unable to load the score
+      console.log(error);
+    });
+  }
+
+  async function loadJSON() {
+    await edit.getJSON().then((data) => {
+      const img = document.getElementById('img')
+      img.src = ''
+      return resultEmbed.loadJSON(data)
+    }).catch(function (error) {
+      // Unable to get the data
+      console.log(error);
+    });
+  }
+
+  async function loadMIDI() {
+    await edit.getMIDI().then((midi) => {
+      console.log(midi);
     })
-    async function beforePdf() {
-    // Fetch an existing PDF document
-    	
+  }
 
-      const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer())
-    // Load a PDFDocument from the existing PDF bytes
-      const pdfDoc = await PDFDocument.load(existingPdfBytes)
-      
-      // Serialize the PDFDocument to bytes (a Uint8Array)
-      const pdfBytes = await pdfDoc.save()
+  async function loadMeta() {
+    alert('not working yet!')
+  }
+</script>
 
-			// Trigger the browser to download the PDF document
-      download(pdfBytes, "pdf-lib_modification_example.pdf", "application/pdf");
-    }
-
-    async function modifyPdf() {
-      // Fetch an existing PDF document
-      const url = 'https://pdf-lib.js.org/assets/with_update_sections.pdf'
-  		const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer())
-      // Fetch PNG image
-      const pngUrl = 'https://static.thenounproject.com/png/501761-200.png'
-      const pngImageBytes = await fetch(pngUrl).then((res) => res.arrayBuffer())
-
-      // Load a PDFDocument from the existing PDF bytes
-      const pdfDoc = await PDFDocument.load(existingPdfBytes)
-      
-			// Embed the PNG image bytes and PNG image bytes
-      const pngImage = await pdfDoc.embedPng(pngImageBytes)
-      
-			// Get the width/height of the JPG image scaled down to 25% of its original size; Dims stands for dimensions
-      const pngDims = pngImage.scale(0.15)
-      
-      // Get the first page of the document
-      const pages = pdfDoc.getPages()
-      const firstPage = pages[0]
-
-      // Get the width and height of the first page
-      const { width, height } = firstPage.getSize()
-      
-      // x is offset from the left side; y is offset from the bottom
-      firstPage.drawImage(pngImage, {
-        x: pngDims.width / 2,
-        y: firstPage.getHeight() / 2 - pngDims.height / 2,
-        width: pngDims.width,
-        height: pngDims.height,
-      })
-
-      // Serialize the PDFDocument to bytes (a Uint8Array)
-      const pdfBytes = await pdfDoc.save()
-      renderInIframe(pdfBytes)
-
-			// Trigger the browser to download the PDF document
-      /* download(pdfBytes, "pdf-lib_modification_example.pdf", "application/pdf") */;
-    }
-  </script>
 </html>
