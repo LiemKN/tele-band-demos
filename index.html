@@ -17,17 +17,24 @@
   <div class="demo-container">
     <div class="lefter"></div>
     <div class="chester">
-      <h3 class="edit">Edit the score then click one of the buttons render your desired file type below!</h3>
+      <h3 class="edit">Edit the score then click one of the buttons render your desired file type and show data below!
+      </h3>
       <div id="edit-container"></div>
-      <div class="button-container">
-        <button class="png" onclick="loadPNG()">PNG</button>
-        <button class="png" onclick="loadXML()">Music XML/MXL</button>
-        <button class="png" onclick="loadJSON()">JSON</button>
-        <button class="png" onclick="loadMIDI()">MIDI</button>
-        <button class="png" onclick="loadMeta()">Score Meta</button>
+      <div id="png-container" class="button-container">
+        <button id='png' onclick="loadPNG()">PNG</button>
+        <img id='img' src="" alt="">
       </div>
-      <h3 id="result-header">Result:</h3>
-      <div id="result-container"><img id="img" src="" alt=""></div>
+      <div id="xml-container" class="button-container">
+        <button onclick="loadXML()">Music XML/MXL</button>
+        <div id='xml-data' class="data-container"></div>
+      </div>
+      <div id="json-container" class="button-container">
+        <button onclick="loadJSON()">JSON</button>
+        <div id='json-data' class="data-container"></div>
+      </div>
+      <button class="not-used" onclick="loadMIDI()">MIDI</button>
+      <button class="not-used" onclick="loadMeta()">Score Meta</button>
+
     </div>
     <div class="righter"></div>
   </div>
@@ -38,50 +45,55 @@
   var edit = new Flat.Embed(editContainer, {
     "width": "100%",
     "height": "450",
-    "score": "60a51bf21c50d81fb20e3527",
+    "score": "60af017bc476464839e77b63",
     "embedParams": {
       "mode": "edit",
-      "appId": "60a51c906bcde01fc75a3ad0",
-      "sharingKey": "d1ec638f0eade5a3a2ad3bcadce9b7664273a7b2352844458385fe7d8d20238620f61a668ee3055d2d3177bd9282fcc88c692ea81e6668ae1610b37cde6aae93"
+      "appId": "60a51a1da9e2b548d5ffe23b",
+      "sharingKey": "602bb47aeddbba5c76a065df7a0c6122cb31122ce396668a7456f40411c205a520d27fb84d1e0961fb04298e71dfb1479218d79ca198e799ba559d039ebcdb70"
     },
   });
-
-  var resultContainer = document.getElementById("result-container");
-  var resultEmbed = new Flat.Embed(resultContainer, {
-    "width": "100%",
-    "height": "300",
-    "embedParams": {
-      "appId": "60a51c906bcde01fc75a3ad0",
-    },
-  });
-
-  let resultHeader = document.getElementById('result-header')
 
   async function loadPNG() {
+    const pngContainer = document.getElementById('png-container')
     let png = await edit.getPNG({
       result: 'dataURL',
       // layout: 'layout',
       // dpi: 300
     })
-    resultHeader.innerHTML = 'Rendering PNG:'
     const img = document.getElementById('img')
     img.src = png
   }
 
   async function loadXML() {
-    let buffer = await edit.getMusicXML({ compressed: true })
-    const img = document.getElementById('img')
-    resultHeader.innerHTML = 'Rendering MXL (compressed):'
-    img.src = ''
-    resultEmbed.loadMusicXML(buffer);
+    var xmlContainer = document.getElementById("xml-container");
+    var xmlEmbed = new Flat.Embed(xmlContainer, {
+      "width": "100%",
+      "height": "300",
+      "embedParams": {
+        "appId": "60a51c906bcde01fc75a3ad0",
+      },
+    });
+    let string = await edit.getMusicXML()
+    xmlEmbed.loadMusicXML(string)
+    let xmlData = document.getElementById('xml-data')
+    xmlData.innerHTML = string
+    console.log(string);
   }
 
   async function loadJSON() {
+    var jsonContainer = document.getElementById("json-container");
+    var jsonEmbed = new Flat.Embed(jsonContainer, {
+      "width": "100%",
+      "height": "300",
+      "embedParams": {
+        "appId": "60a51c906bcde01fc75a3ad0",
+      },
+    });
     let data = await edit.getJSON()
-    const img = document.getElementById('img')
-    resultHeader.innerHTML = 'Rendering JSON:'
-    img.src = ''
-    resultEmbed.loadJSON(data)
+    jsonEmbed.loadJSON(data)
+    let jsonData = document.getElementById('json-data')
+    jsonData.innerHTML = JSON.stringify(data['score-partwise'])
+    console.log(data['score-partwise'])
   }
 
   async function loadMIDI() {

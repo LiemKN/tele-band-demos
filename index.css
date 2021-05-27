@@ -32,22 +32,26 @@ header {
   flex-grow: 3;
 }
 
-#result-container {
+.button-container {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.button-container {
-  display: flex;
-  align-items: center;
+.data-container {
+  margin: 10px 0;
+  width: 100%;
+}
+
+.not-used {
+  display: none;
 }
 
 button {
   background-color: turquoise;
   border: none;
   padding: 10px;
-  margin: 10px 15px 0 0;
+  margin: 10px 15px 12px 0;
   border-radius: 10px;
 }
 
