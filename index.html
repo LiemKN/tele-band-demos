@@ -19,11 +19,7 @@
     <div class="chester">
       <h3 class="edit">Edit the score then click one of the buttons render your desired file type and show data below!
       </h3>
-      <p>using html embed code</p>
-      <iframe
-        src="https://flat.io/embed/60af017bc476464839e77b63?appId=60a51a1da9e2b548d5ffe23b&sharingKey=372732f148c57c9d2b85103a37c395b5b4a8a7c5608f50b76ae3f1e4a3f4622d5689f67be1766cf7cb6ae01a8662768d9964f0bfd14596f9ae54382cf53afa2e"
-        height="450" width="100%" frameBorder="0" allowfullscreen allow="midi"></iframe>
-      <p>using javascript api</p>
+      <p>Using javascript api</p>
       <div id="edit-container"></div>
       <div id="png-container" class="button-container">
         <button id='png' onclick="loadPNG()">PNG</button>
@@ -50,11 +46,12 @@
   var edit = new Flat.Embed(editContainer, {
     "width": "100%",
     "height": "450",
-    "score": "60af017bc476464839e77b63",
+    "score": "60a51bf21c50d81fb20e3527",
     "embedParams": {
       "mode": "edit",
-      "appId": "60a51a1da9e2b548d5ffe23b",
-      "sharingKey": "372732f148c57c9d2b85103a37c395b5b4a8a7c5608f50b76ae3f1e4a3f4622d5689f67be1766cf7cb6ae01a8662768d9964f0bfd14596f9ae54382cf53afa2e"
+      "appId": "60a51c906bcde01fc75a3ad0",
+      "sharingKey": "d1ec638f0eade5a3a2ad3bcadce9b7664273a7b2352844458385fe7d8d20238620f61a668ee3055d2d3177bd9282fcc88c692ea81e6668ae1610b37cde6aae93"
+
     },
   });
 
@@ -75,7 +72,7 @@
       "width": "100%",
       "height": "300",
       "embedParams": {
-        "appId": "60a51a1da9e2b548d5ffe23b",
+        "appId": "60a51c906bcde01fc75a3ad0",
       },
     });
     let string = await edit.getMusicXML()
@@ -91,7 +88,7 @@
       "width": "100%",
       "height": "300",
       "embedParams": {
-        "appId": "60a51a1da9e2b548d5ffe23b",
+        "appId": "60a51c906bcde01fc75a3ad0",
       },
     });
     let data = await edit.getJSON()
